@@ -7,10 +7,14 @@ use std::collections::HashMap;
 
 use colored::Colorize;
 use login::get_input;
-
-
+use mysql::Pool;
 
 fn main() {
+
+  //db connect
+  let url = "mysql://root:root@localhost:8888/blog_master";
+  let pool = Pool::new(url).unwrap();
+  let mut conn = pool.get_conn().unwrap();
   let mut users = HashMap::new();
   let mut session = login::Session { current_user: None };
   
