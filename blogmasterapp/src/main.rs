@@ -1,67 +1,66 @@
-use bcrypt::{hash, verify, DEFAULT_COST};
-use colored::*;
-use std::collections::HashMap;
-use std::io::{self, Write};
+mod login;
+mod blog;
 
-struct User {
-    username: String,
-    password_hash: String,
-}
+use std::collections::HashMap;
+
+use colored::Colorize;
+use login::get_input;
+
+
 
 fn main() {
-    let mut users = HashMap::new();
+  let mut users = HashMap::new();
+  let mut session = login::Session { current_user: None };
 
     loop {
         println!("\n~~~~~~~~~~~~");
-        println!("{}", "1. Inscription".cyan());
-        println!("{}", "2. Connexion".green());
-        println!("{}", "3. Quitter".yellow());
+        println!("{}", "0. Quitter".yellow());
+        if session.current_user.is_none() {
+          println!("{}", "1. Inscription".cyan());
+          println!("{}", "2. Connexion".green());
+        }
+        if session.current_user.is_some() {
+          println!("3. {}", "Créer un blog simple".blue());
+          println!("4. {}", "Logout".blue());
+      }
         println!("~~~~~~~~~~~~");
 
         let choice = get_input("... : ");
         match choice.trim() {
-            "1" => register(&mut users),
-            "2" => login(&users),
-            "3" => break,
+            "0" => break,
+            "1" => {
+              if session.current_user.is_none() {
+                login::register(&mut users);
+              }
+              else {
+                println!("{}", "Vous êtes déjà inscrit !".red());
+              }
+            }
+            "2" => {
+              if session.current_user.is_none() {
+                login::login(&users, &mut session);
+              }
+              else {
+                println!("{}", "Vous êtes déjà connecté !".red());
+              }
+            }
+            "3" => {
+              if session.current_user.is_some() {
+                blog::createBlog();
+              }
+              else {
+                println!("{}", "Veuillez vous connecter avant de continuer !".red());
+              }
+            }
+            "4" => {
+              if session.current_user.is_some() {
+                login::logout(&mut session);
+              }
+              else {
+                println!("{}", "Veuillez vous connecter avant de continuer !".red());
+              }
+            }
             _ => println!("{}", "Option invalide".red()),
         }
     }
-}
-
-fn register(users: &mut HashMap<String, String>) {
-    let username = get_input("\nNom d'utilisateur : ");
-    if users.contains_key(&username) {
-      println!("{}", "L'utilisateur est déjà inscrit !".red());
-      return;
-    }
-    let password = get_input("Mot de passe : ");
-    let password_hash = hash(password, DEFAULT_COST).expect("Error hashing password");
-
-    users.insert(username, password_hash);
-    println!("{}", "Inscription réussie !".green());
-}
-
-fn login(users: &HashMap<String, String>) {
-    let username = get_input("\nNom d'utilisateur : ");
-    let password = get_input("Mot de passe : ");
-
-    match users.get(&username) {
-        Some(stored_hash) => {
-            if verify(password, stored_hash).expect("Error verifying password") {
-                println!("{}", "Connexion réussie !".green());
-            } else {
-                println!("{}", "Le nom d'utilisateur ou le mot de passe est invalide !".red());
-            }
-        }
-        None => println!("{}", "Le nom d'utilisateur ou le mot de passe est invalide !".red()),
-    }
-}
-
-fn get_input(prompt: &str) -> String {
-    print!("{}", prompt);
-    io::stdout().flush().expect("Error flushing stdout");
-
-    let mut input = String::new();
-    io::stdin().read_line(&mut input).expect("Error reading input");
-    input.trim().to_string()
 }
