@@ -1,5 +1,7 @@
 mod login;
 mod blog;
+mod channel;
+mod message;
 
 use std::collections::HashMap;
 
@@ -11,6 +13,7 @@ use login::get_input;
 fn main() {
   let mut users = HashMap::new();
   let mut session = login::Session { current_user: None };
+  
 
     loop {
         println!("\n~~~~~~~~~~~~");

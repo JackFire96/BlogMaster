@@ -23,3 +23,7 @@ pub fn createBlog() {
 pub fn listBlog() {
   //Methode pour récupérer les blogs de la BDD
 }
+
+pub fn addOptions() {
+  
+}
