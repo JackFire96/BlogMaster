@@ -10,7 +10,7 @@ pub struct Message {
   pub text: String,
 }
 
-pub fn createMessage(channel: &Channel, session: &mut Session) {
+pub fn sendMessage(channel: &Channel, session: &mut Session) {
   let text = super::login::get_input("Votre message : ");
 
   let message = Message {
