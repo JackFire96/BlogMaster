@@ -1,7 +1,8 @@
 mod login;
 mod blog;
-mod channel;
+mod article;
 mod message;
+mod db_connect;
 
 use std::collections::HashMap;
 
@@ -12,7 +13,7 @@ use mysql::Pool;
 fn main() {
 
   //db connect
-  let url = "mysql://root:root@localhost:8888/blog_master";
+  let url = "mysql://root:@localhost:3306/blog_master";
   let pool = Pool::new(url).unwrap();
   let mut conn = pool.get_conn().unwrap();
   let mut users = HashMap::new();
@@ -27,7 +28,7 @@ fn main() {
           println!("{}", "2. Connexion".green());
         }
         if session.current_user.is_some() {
-          println!("3. {}", "Créer un blog simple".blue());
+          println!("3. {}", "Créer un blog".blue());
           println!("4. {}", "Logout".blue());
       }
         println!("~~~~~~~~~~~~");
@@ -53,7 +54,7 @@ fn main() {
             }
             "3" => {
               if session.current_user.is_some() {
-                blog::createBlog();
+                blog::createBlog(&pool);
               }
               else {
                 println!("{}", "Veuillez vous connecter avant de continuer !".red());

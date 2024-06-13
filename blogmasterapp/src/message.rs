@@ -1,7 +1,7 @@
 use chrono::{DateTime, Local};
 use colored::*;
 
-use crate::{channel::Channel, login::Session};
+use crate::{article::Channel, login::Session};
 
 pub struct Message {
   pub channel: String,
