@@ -54,7 +54,7 @@ fn insert_blog(pool: &Pool, blog: Blog) -> std::result::Result<(), Box<dyn std::
   Ok(())
 }
 
-pub fn list_blog(pool: &Pool) {
+pub fn list_blog(pool: &Pool, session: &Session) {
   let blogs = get_blogs(pool).expect("Erreur lors de la récupération des blogs");
 
   loop {
@@ -77,7 +77,7 @@ pub fn list_blog(pool: &Pool) {
             Ok(blog_id) => {
                 if id_exists(&pool, blog_id) {
                     // print blog
-                    menu_articles(pool, blog_id);
+                    menu_articles(pool, blog_id, session);
                 } else {
                     println!("{}", "Aucun blog trouvé avec ce numéro".red());
                 }
@@ -116,7 +116,7 @@ pub fn id_exists(pool: &Pool, id: i64) -> bool {
   }
 }
 
-pub fn menu_articles(pool: &Pool, blogid: i64) {
+pub fn menu_articles(pool: &Pool, blogid: i64, session: &Session) {
   let blogs = get_blogs(pool).expect("Erreur lors de la récupération des blogs");
 
   loop {
@@ -133,7 +133,7 @@ pub fn menu_articles(pool: &Pool, blogid: i64) {
               createArticle(pool, blogid);
             }
             "2" => {
-              list_article(pool);
+              list_article(pool, session, blogid);
             }
             _ => println!("{}", "Option invalide".red()),
         }

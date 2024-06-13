@@ -1,7 +1,7 @@
 use colored::*;
 use mysql::{params, prelude::Queryable, Pool};
 
-use crate::login::get_input;
+use crate::{blog, login::{get_input, Session}, message::{list_message, sendMessage}};
 
 pub struct Article {
   pub id: Option<i64>,
@@ -47,8 +47,8 @@ fn insert_article(pool: &Pool, article: Article) -> std::result::Result<(), Box<
   Ok(())
 }
 
-pub fn list_article(pool: &Pool) {
-  let articles = get_articles(pool).expect("Erreur lors de la récupération des articles");
+pub fn list_article(pool: &Pool, session: &Session, blogid: i64) {
+  let articles = get_articles(pool, blogid).expect("Erreur lors de la récupération des articles");
 
   loop {
     println!("~~~~~~~~~~~~");
@@ -68,9 +68,9 @@ pub fn list_article(pool: &Pool) {
       input => {
         match input.parse::<i64>() {
             Ok(article_id) => {
-                if id_exists(&pool, article_id) {
+                if id_exists(&pool, article_id, blogid) {
                     // print blog
-                    // menu_messages(pool, article_id);
+                    menu_messages(pool, article_id, session, blogid);
                 } else {
                     println!("{}", "Aucun article trouvé avec ce numéro".red());
                 }
@@ -84,13 +84,16 @@ pub fn list_article(pool: &Pool) {
   }
 }
 
-fn get_articles(pool: &Pool) -> std::result::Result<Vec<Article>, Box<dyn std::error::Error>> {
+fn get_articles(pool: &Pool, blogid: i64) -> std::result::Result<Vec<Article>, Box<dyn std::error::Error>> {
   // Obtenez une connexion
   let mut conn = pool.get_conn()?;
 
   // Exécuter la requête de sélection
-  let articles = conn.query_map(
-      "SELECT id, titre, contenu, blog_id FROM article",
+  let articles = conn.exec_map(
+      "SELECT id, titre, contenu, blog_id FROM article WHERE blog_id = :blogid",
+      params! {
+        "blogid" => blogid,
+    },
       |(id, titre, contenu, blog_id)| Article {
           id: Some(id),
           titre,
@@ -102,9 +105,34 @@ fn get_articles(pool: &Pool) -> std::result::Result<Vec<Article>, Box<dyn std::e
   Ok(articles)
 }
 
-pub fn id_exists(pool: &Pool, id: i64) -> bool {
-  match get_articles(pool) {
+pub fn id_exists(pool: &Pool, id: i64, blogid: i64) -> bool {
+  match get_articles(pool, blogid) {
       Ok(articles) => articles.iter().any(|article| article.id == Some(id)),
       Err(_) => false,
   }
+}
+
+pub fn menu_messages(pool: &Pool, articleid: i64, mut session: &Session, blogid: i64) {
+  let articles = get_articles(pool, blogid).expect("Erreur lors de la récupération des articles");
+
+  loop {
+    println!("~~~~~~~~~~~~");
+    println!("{}", "1. Envoyer un message :".cyan());
+    println!("{}", "2. Voir les messages :".cyan());
+    println!("{}", "x. Quitter".yellow());
+    println!("~~~~~~~~~~~~");
+
+    let choice = get_input("... : ");
+        match choice.trim() {
+            "x" => break,
+            "1" => {
+              sendMessage(pool, articleid, session);
+            }
+            "2" => {
+              list_message(pool, articleid);
+            }
+            _ => println!("{}", "Option invalide".red()),
+        }
+  }
+
 }

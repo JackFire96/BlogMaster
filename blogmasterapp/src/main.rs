@@ -47,7 +47,7 @@ fn main() {
             }
             "2" => {
               if session.current_user.is_none() {
-                login::login(&users, &mut session);
+                login::login  (&users, &mut session);
               }
               else {
                 println!("{}", "Vous êtes déjà connecté !".red());
@@ -63,7 +63,7 @@ fn main() {
             }
             "4" => {
               if session.current_user.is_some() {
-                blog::list_blog(&pool);
+                blog::list_blog(&pool, &session);
               }
               else {
                 println!("{}", "Veuillez vous connecter avant de continuer !".red());
