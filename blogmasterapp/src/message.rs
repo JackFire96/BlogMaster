@@ -1,25 +1,25 @@
-use chrono::{DateTime, Local};
-use colored::*;
+// use chrono::{DateTime, Local};
+// use colored::*;
 
-use crate::{article::Channel, login::Session};
+// use crate::{article::Channel, login::Session};
 
-pub struct Message {
-  pub channel: String,
-  pub username: String,
-  pub time: DateTime<Local>,
-  pub text: String,
-}
+// pub struct Message {
+//   pub channel: String,
+//   pub username: String,
+//   pub time: DateTime<Local>,
+//   pub text: String,
+// }
 
-pub fn sendMessage(channel: &Channel, session: &mut Session) {
-  let text = super::login::get_input("Votre message : ");
+// pub fn sendMessage(channel: &Channel, session: &mut Session) {
+//   let text = super::login::get_input("Votre message : ");
 
-  let message = Message {
-    channel: channel.name.clone(),
-    username: session.current_user.clone().unwrap(),
-    time: Local::now(),
-    text: text.clone(),
-  };
+//   let message = Message {
+//     channel: channel.name.clone(),
+//     username: session.current_user.clone().unwrap(),
+//     time: Local::now(),
+//     text: text.clone(),
+//   };
 
-   //Push dans la BDD
-   println!("{}", format!("Le message ['{}', '{}', '{}'] est créé !", message.username, message.time, text).green());
-}
+//    //Push dans la BDD
+//    println!("{}", format!("Le message ['{}', '{}', '{}'] est créé !", message.username, message.time, text).green());
+// }
