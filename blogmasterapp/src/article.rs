@@ -55,9 +55,10 @@ pub fn list_article(pool: &Pool, session: &Session, blogid: i64) {
     println!("{}", "Séléctionnez un article :".cyan());
     for article in &articles {
       println!(
-        "{}. {}",
+        "{}. {} : {}",
         article.id.unwrap_or_default(),
         article.titre,
+        article.contenu,
       );
     }
     println!("{}", "x. Quitter".yellow());
